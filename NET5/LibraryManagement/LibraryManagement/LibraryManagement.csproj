@@ -10,7 +10,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Syncfusion.Blazor.Grid" Version="19.1.*" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="20.1.0.56" />
   </ItemGroup>
 
 </Project>
