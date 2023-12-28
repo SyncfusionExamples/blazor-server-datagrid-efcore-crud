@@ -1,0 +1,58 @@
+﻿@page "/counter"
+@rendermode InteractiveAuto
+
+@using Syncfusion.Blazor.Data
+@using BlazorWebApp.Shared.Models
+@using BlazorWebApp.Shared.Services
+
+@inject ClientServices clientlibrary
+
+<SfGrid DataSource="@LibraryBooks" Toolbar="@(new List<string>() { "Add", "Edit", "Delete", "Cancel", "Update" })" TValue="Book">
+    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" Mode="EditMode.Normal"></GridEditSettings>
+    <GridEvents OnActionBegin="ActionBeginHandler" OnActionComplete="ActionCompleteHandler" TValue="Book"></GridEvents>
+    <GridColumns>
+        <GridColumn Field="@nameof(Book.Id)" IsPrimaryKey="true" IsIdentity="true" Visible="false"></GridColumn>
+        <GridColumn Field="@nameof(Book.Name)" Width="150"></GridColumn>
+        <GridColumn Field="@nameof(Book.Author)" Width="150"></GridColumn>
+        <GridColumn Field="@nameof(Book.Quantity)" Width="90" TextAlign="TextAlign.Right"></GridColumn>
+        <GridColumn Field="@nameof(Book.Price)" Width="90" Format="C2" TextAlign="TextAlign.Right"></GridColumn>
+        <GridColumn Field="@nameof(Book.Available)" DisplayAsCheckBox="true" Width="70"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code
+{
+    public List<Book> LibraryBooks { get; set; }
+    protected override async Task OnInitializedAsync ()
+    {
+        LibraryBooks = await clientlibrary.GetBooks();
+    }
+    public async void ActionBeginHandler ( ActionEventArgs<Book> Args )
+    {
+        //Will be triggered when CRUD action is initiated
+        if (Args.Action == "Add")
+        {
+            // Insert the changes into your database here.
+            await clientlibrary.InsertBook(Args.Data);
+        }
+        if (Args.Action == "Edit")
+        {
+            //Update the changes into your database here.
+            await clientlibrary.UpdateBook(Args.Data.Id, Args.Data);
+        }
+        if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            //Remove the record from your database
+            await clientlibrary.RemoveBook(Args.Data.Id);
+        }
+    }
+    public async void ActionCompleteHandler ( ActionEventArgs<Book> Args )
+    {
+        //will be triggered when CRUD action is complete.
+        if (Args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            LibraryBooks = await clientlibrary.GetBooks(); //to fetch the updated data from db to Grid
+        }
+    }
+}
+
